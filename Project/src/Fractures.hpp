@@ -2,7 +2,7 @@
 #define __FRACTURES_H__
 
 #include "Eigen/Eigen"
-#include <map>;
+#include <map>
 
 using namespace std;
 using namespace Eigen;
@@ -14,7 +14,7 @@ namespace fractureLibrary{
 struct Fractures
 {
     unsigned int FractureNumber ;                     // intero positivo contiene il numero totale di fratture nel file
-    unsigned int VerticeNumber ;                    // intero positivo contiene per ogni frattura il numero di vertici
+    vector<unsigned int> VerticeNumber ;                    //vettore di interi positivi contiene per ogni frattura il numero di vertici
     vector<unsigned int> Id ;                       // Vettore di interi positivi contiene l'identificativo di ogni frattura
     vector<Vector3d> Coordinates ;                  // vettore 1xFractureNumber di vettori 3x1 di double. Contiene le coordinate dei vertici
 
