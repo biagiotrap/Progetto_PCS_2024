@@ -52,10 +52,48 @@ bool ImportData(const string &filepath,Fractures& fracture){
             }
             fracture.Coordinates.push_back(coord);
             p=0;
-            cout<<coord<<endl;
         }
     }
     return true;
 }
+
+bool DefineTraces(const string &fileOutput, Fractures& fracture){
+    vector<Vector3d> n;
+    vector<double> d;
+    Vector3d t;
+    vector<Vector3d> Points;
+    n.resize(fracture.FractureNumber);
+    d.resize(fracture.FractureNumber);
+    Points.reserve(fracture.FractureNumber*(fracture.FractureNumber-1)/2);
+    int sommaParziale=0;
+    for(unsigned int i=0;i<fracture.FractureNumber;i++){
+        Vector3d u;
+        Vector3d v;
+        u=fracture.Coordinates[sommaParziale+1]-fracture.Coordinates[sommaParziale];
+        v=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
+        sommaParziale+=fracture.VerticeNumber[i];
+        n[i]=u.cross(v);
+        d[i]=n[i].dot(fracture.Coordinates[sommaParziale]);
+    }
+    for(unsigned int i=0; i<n.size()-1;i++){
+        for(unsigned int j=1; j<n.size();j++){
+            j+=i;
+            Vector3d t;
+            t=n[i].cross(n[j]);
+            MatrixXd A=MatrixXd::Ones(3, 3);
+            A<<n[i], n[i+j], t;
+            if(A.determinant()!=0){
+                Vector3d u;
+                Vector3d b;
+                b<<d[i],d[i+j],0;
+                Vector3d x=A.lu().solve(b);
+                cout<<x<<endl;
+            }
+        }
+    }
+    return true;
 }
+
+}
+
 
