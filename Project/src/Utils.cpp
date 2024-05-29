@@ -8,6 +8,7 @@ using namespace std;
 using namespace Eigen;
 namespace fractureLibrary{
 bool ImportData(const string &filepath,Fractures& fracture){
+    //apertura del file per importare i dati
     ifstream file;
     file.open(filepath);
     if(file.fail()){
@@ -33,6 +34,10 @@ bool ImportData(const string &filepath,Fractures& fracture){
         getline(file,line);
         vector<double> data;
         data.resize(fracture.VerticeNumber[i]*3);
+        //Per memorizzare le coordinate, le inseriamo prima tutte in un unico vettore
+        //e poi lo scomponiamo in tanti vettori quanti sono i numeri dei vertici,
+        //in cui ogni vettore contiene 3 elementi che sono stati presi muovendosi nel vettore iniziale di
+        //"numero di vertici" posizioni
         for(unsigned int c=0;c<fracture.VerticeNumber[i]*3;c++){
             if((c-3)%(fracture.VerticeNumber[i])==0){
                 getline(file,line);
@@ -67,32 +72,42 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
     Points.reserve(fracture.FractureNumber*(fracture.FractureNumber-1)/2);
     int sommaParziale=0;
     for(unsigned int i=0;i<fracture.FractureNumber;i++){
+        //Calcolo generatoti del piano in cui è situata la frattura
         Vector3d u;
         Vector3d v;
         u=fracture.Coordinates[sommaParziale+1]-fracture.Coordinates[sommaParziale];
         v=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
         sommaParziale+=fracture.VerticeNumber[i];
-        n[i]=u.cross(v);
+        n[i]=(u.cross(v))/u.norm()*v.norm(); //vettore perpendicolare a u e v
         d[i]=n[i].dot(fracture.Coordinates[sommaParziale]);
     }
     for(unsigned int i=0; i<n.size()-1;i++){
         for(unsigned int j=1; j<n.size();j++){
+            //calcolo del sistema lineare
             j+=i;
             Vector3d t;
             t=n[i].cross(n[j]);
             MatrixXd A=MatrixXd::Ones(3, 3);
             A<<n[i], n[i+j], t;
-            if(A.determinant()!=0){
+            if(A.determinant()!=0){ //Se il determinante della matrice A contenente
+  //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
                 Vector3d u;
                 Vector3d b;
                 b<<d[i],d[i+j],0;
                 Vector3d x=A.lu().solve(b);
-                cout<<x<<endl;
+                //Una volta controllato se i due piani si intersecano bisogna
+ //controllare se le fratture presenti nei due piani hanno due o meno intersezioni
+ //2 intersezioni:traccia passante
+ //altrimenti:traccia interna
+
+
+
             }
         }
     }
     return true;
 }
+
 
 }
 
