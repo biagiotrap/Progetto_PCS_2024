@@ -4,6 +4,7 @@
 #include<sstream>
 #include"Eigen/Eigen"
 #include<vector>
+#include<iomanip>
 using namespace std;
 using namespace Eigen;
 namespace fractureLibrary{
@@ -33,13 +34,13 @@ bool ImportData(const string &filepath,Fractures& fracture){
         fracture.VerticeNumber.push_back(numV); //Aggiunto al vettore
         getline(file,line); //Riga "#Vertices" (Scarta)
         vector<double> data;
-        data.resize(numV*3); //3 Coordinate per numero di vertici
+        data.resize(fracture.VerticeNumber[i]*3); //3 Coordinate per numero di vertici
         //Per memorizzare le coordinate, le inseriamo prima tutte in un unico vettore di lunghezza 3*(numero di vertici),
         //poi lo scomponiamo in tanti vettori di tre elementi quanti sono i numeri dei vertici.
         //Ogni vettore contiene le tre coordinate prese muovendosi nel vettore iniziale di
         //(numero di vertici) posizioni
         for(unsigned int c=0;c<fracture.VerticeNumber[i]*3;c++){ //Iteriamo su 3*(numero di vertici) coordinate
-            if((c-(fracture.VerticeNumber[i]-1))%(fracture.VerticeNumber[i])==0){ //L'ultima coordinata della riga non termina con un ";"
+            if((c-(fracture.VerticeNumber[i]-1))%(fracture.VerticeNumber[i])==0){ //L'ultima coordinata della riga non termina con un ";
                 getline(file,line);
             }
             else{
@@ -79,34 +80,39 @@ bool ImportData(const string &filepath,Fractures& fracture){
 }
 
 bool DefineTraces(const string &fileOutput, Fractures& fracture){
+
+    double tol=1e-10;
     vector<Vector3d> n; //Contiene terne che sono i versori normali alle fratture
     vector<double> d;
     vector<Vector3d> Points;
     n.resize(fracture.FractureNumber); //Dimensione di n=1*(numero di fratture)
-    d.resize(fracture.FractureNumber); //Dimensione di d=1*(numero di fratture)
+    d.resize(fracture.FractureNumber);//Dimensione di d=1*(numero di fratture)
     Points.reserve(fracture.FractureNumber*(fracture.FractureNumber-1)/2);
     int sommaParziale=0; //Le coordinate non sono divise per fratture. Usiamo quindi "Somma Parziale" per considerare solo i primi tre vertici di ogni frattura
     for(unsigned int i=0;i<fracture.FractureNumber;i++){
-        //Calcolo generatori del piano u e v in cui è situata la frattura
+        //Calcolo generatoti del piano in cui è situata la frattura
         Vector3d u;
         Vector3d v;
-        u=fracture.Coordinates[sommaParziale+1]-fracture.Coordinates[sommaParziale];
-        v=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
-        //Passo alla prossima frattura
+        u=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
+        v=fracture.Coordinates[sommaParziale+1]-fracture.Coordinates[sommaParziale];
+            //Passo alla prossima frattura
+        cout<<setprecision(10);
         sommaParziale+=fracture.VerticeNumber[i];
         n[i]=(u.cross(v))/(u.norm()*v.norm()); //Versore perpendicolare a u e v
         d[i]=n[i].dot(fracture.Coordinates[sommaParziale]);
     }
-    for(unsigned int i=0; i<n.size()-1;i++){ //differenza con fracturenumber?
+    for(unsigned int i=0; i<n.size()-1;i++){
         for(unsigned int j=1; j<n.size();j++){
             //calcolo del sistema lineare
             j+=i;
             Vector3d t; //Vettore tangente alla traccia
             t=n[i].cross(n[j]);
             MatrixXd A=MatrixXd::Ones(3, 3);
-            A<<n[i], n[i+j], t;
-            if(A.determinant() !=0){ //Se il determinante della matrice A contenente
-            //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
+            A<<n[i], n[j], t;
+            cout<<A.determinant()<<endl;
+            if(A.determinant()>tol){ //Se il determinante della matrice A contenente
+                //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
+>>>>>>> main
                 Vector3d u;
                 Vector3d b;
                 b<<d[i],d[i+j],0;
@@ -143,7 +149,4 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
 //     }
 //     return true;
 // }
-
 }
-
-
