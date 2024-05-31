@@ -4,6 +4,7 @@
 #include<sstream>
 #include"Eigen/Eigen"
 #include<vector>
+#include<iomanip>
 using namespace std;
 using namespace Eigen;
 namespace fractureLibrary{
@@ -39,7 +40,7 @@ bool ImportData(const string &filepath,Fractures& fracture){
         //in cui ogni vettore contiene 3 elementi che sono stati presi muovendosi nel vettore iniziale di
         //"numero di vertici" posizioni
         for(unsigned int c=0;c<fracture.VerticeNumber[i]*3;c++){
-            if((c-3)%(fracture.VerticeNumber[i])==0){
+            if((c-(fracture.VerticeNumber[i]-1))%(fracture.VerticeNumber[i])==0){
                 getline(file,line);
             }
             else{
@@ -63,6 +64,7 @@ bool ImportData(const string &filepath,Fractures& fracture){
 }
 
 bool DefineTraces(const string &fileOutput, Fractures& fracture){
+    double tol=1e-10;
     vector<Vector3d> n;
     vector<double> d;
     Vector3d t;
@@ -75,10 +77,11 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
         //Calcolo generatoti del piano in cui è situata la frattura
         Vector3d u;
         Vector3d v;
-        u=fracture.Coordinates[sommaParziale+1]-fracture.Coordinates[sommaParziale];
-        v=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
+        u=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
+        v=fracture.Coordinates[sommaParziale+1]-fracture.Coordinates[sommaParziale];
+        cout<<setprecision(10);
         sommaParziale+=fracture.VerticeNumber[i];
-        n[i]=(u.cross(v))/u.norm()*v.norm(); //vettore perpendicolare a u e v
+        n[i]=(u.cross(v))/(u.norm()*v.norm()); //vettore perpendicolare a u e v
         d[i]=n[i].dot(fracture.Coordinates[sommaParziale]);
     }
     for(unsigned int i=0; i<n.size()-1;i++){
@@ -88,8 +91,9 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
             Vector3d t;
             t=n[i].cross(n[j]);
             MatrixXd A=MatrixXd::Ones(3, 3);
-            A<<n[i], n[i+j], t;
-            if(A.determinant()!=0){ //Se il determinante della matrice A contenente
+            A<<n[i], n[j], t;
+            cout<<A.determinant()<<endl;
+            if(A.determinant()>tol){ //Se il determinante della matrice A contenente
   //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
                 Vector3d u;
                 Vector3d b;
@@ -98,10 +102,13 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
                 //Una volta controllato se i due piani si intersecano bisogna
  //controllare se le fratture presenti nei due piani hanno due o meno intersezioni
  //2 intersezioni:traccia passante
- //altrimenti:traccia interna
+ //altrimenti:traccia interna oppure le due fratture non si intersecano
 
 
+                //Calcolo intersezioni  dei lati delle fratture
+                //for(unsigned int a=0;a<fracture.VerticeNumber[i];a++){
 
+                //}
             }
         }
     }
