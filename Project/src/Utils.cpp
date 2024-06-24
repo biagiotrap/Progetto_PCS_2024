@@ -6,6 +6,8 @@
 #include<vector>
 #include<iomanip>
 
+
+
 using namespace std;
 using namespace Eigen;
 
@@ -115,6 +117,8 @@ void ComputeSegments(const Fractures& fracture, vector<vector<Vector3d>>& segmen
 
 
 
+
+
 bool DefineTraces(const string &fileOutput, Fractures& fracture){
 
     double tol=1e-10;
@@ -147,6 +151,11 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
             A<<n[i], n[j], t;
             cout<<A.determinant()<<endl;
             if(A.determinant()>tol){ //Se il determinante della matrice A contenente
+
+
+                //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
+
+
                 Vector3d u;
                 Vector3d b;
                 b<<d[i],d[i+j],0;
@@ -163,6 +172,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
     }
     ofstream outFile(fileOutput);
     outFile << "# Number of traces" << endl;
+
     outFile << fracture.TracesNumber << endl;
 
     outFile << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
@@ -172,6 +182,17 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
 
     outFile << "# FractureId; NumTraces" << endl;
     for (unsigned int f=0;f<fracture.FractureNumber;f++){
+
+    outfile << fracture.TracesNumber << endl;
+
+    outFile << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+    for (t=0;t<fracture.TracesNumber;t++){
+        //itera sulle tracce ecc
+    }
+
+    outfile << "# FractureId; NumTraces" << endl;
+    for (f=0;f<fracture.FractureNumber;f++){
+
         //Per ogni frattura il numero di tracce
     }
     return true;

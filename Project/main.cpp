@@ -17,6 +17,9 @@ int main(){
     } else {
         cout << "Errore nell'importazione dei dati." << endl;
     }
-    // ...
+    string fileOutput="Tracce.txt";
+    ImportData(filepath, fracture);
+    DefineTraces(fileOutput, fracture);
+
     return 0;
 }
