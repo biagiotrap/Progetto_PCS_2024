@@ -24,6 +24,8 @@ bool ComputeLenghts(Fractures& fracture);
 // Ordinare usando l'algoritmo MergeSort--> da vedere quali parametri metterci dentro
 bool MergeSort();
 
+void ComputeSegments(const Fractures& fracture, vector<vector<Vector3d>>& segments);
+
 
 
 

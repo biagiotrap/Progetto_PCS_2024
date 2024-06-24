@@ -5,8 +5,12 @@
 #include"Eigen/Eigen"
 #include<vector>
 #include<iomanip>
+
+
+
 using namespace std;
 using namespace Eigen;
+
 namespace fractureLibrary{
 bool ImportData(const string &filepath,Fractures& fracture){
     //apertura del file per importare i dati
@@ -79,6 +83,42 @@ bool ImportData(const string &filepath,Fractures& fracture){
 
 }
 
+void ComputeSegments(const Fractures& fracture, vector<vector<Vector3d>>& segments) { // scelto di il vettore di vettori in modo da tenere separato i segmenti di ogni frattura
+
+    for (unsigned int i = 0; i < fracture.FractureNumber; ++i) { // Iteriamo su tutte le fratture
+        vector<Vector3d> fractureSegments; // Vettore dei segmenti per la frattura corrente
+
+        // Calcola startIndex e endIndex per la frattura corrente
+        unsigned int startIndex = 0;
+        for (unsigned int j = 0; j < i; ++j) { // Somma il numero di vertici delle fratture precedenti per ottenere l'indice di inizio
+            startIndex += fracture.VerticeNumber[j];
+        }
+        unsigned int endIndex = startIndex + fracture.VerticeNumber[i]; // Calcola l'indice di fine
+
+        // Calcola i segmenti per la frattura corrente
+        for (unsigned int j = startIndex; j < endIndex; ++j) { // Itera su tutti i vertici della frattura corrente
+            Vector3d segment = fracture.Coordinates[(j + 1) % endIndex] - fracture.Coordinates[j]; // Calcola il segmento come differenza tra i punti dei vertici
+
+            // Aggiunge il segmento al vettore dei segmenti
+            fractureSegments.push_back(segment);
+        }
+
+        // Aggiunge i segmenti della frattura corrente al vettore principale dei segmenti
+        segments.push_back(fractureSegments);
+
+        // Stampa i segmenti calcolati per la frattura corrente
+        cout << "Frattura " << i + 1 << ":" << endl;
+        for (unsigned int j = 0; j < fractureSegments.size(); ++j) { // Stampa tutti i segmenti della frattura corrente
+            cout << "    Segmento " << j + 1 << ": (" << fractureSegments[j].transpose() << ")" << endl;
+        }
+    }
+}
+
+
+
+
+
+
 bool DefineTraces(const string &fileOutput, Fractures& fracture){
 
     double tol=1e-10;
@@ -111,8 +151,11 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
             A<<n[i], n[j], t;
             cout<<A.determinant()<<endl;
             if(A.determinant()>tol){ //Se il determinante della matrice A contenente
+
+
                 //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
->>>>>>> main
+
+
                 Vector3d u;
                 Vector3d b;
                 b<<d[i],d[i+j],0;
@@ -129,6 +172,17 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
     }
     ofstream outFile(fileOutput);
     outFile << "# Number of traces" << endl;
+
+    outFile << fracture.TracesNumber << endl;
+
+    outFile << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+    for (unsigned int t=0;t<fracture.TracesNumber;t++){
+        //itera sulle tracce ecc
+    }
+
+    outFile << "# FractureId; NumTraces" << endl;
+    for (unsigned int f=0;f<fracture.FractureNumber;f++){
+
     outfile << fracture.TracesNumber << endl;
 
     outFile << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
@@ -138,6 +192,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
 
     outfile << "# FractureId; NumTraces" << endl;
     for (f=0;f<fracture.FractureNumber;f++){
+
         //Per ogni frattura il numero di tracce
     }
     return true;
