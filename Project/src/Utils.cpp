@@ -54,23 +54,13 @@ bool ImportData(const string &filepath,Fractures& fracture){
         unsigned int p=0;
         for(unsigned int d=0;d<fracture.VerticeNumber[i];d++){
             Vector3d coord;
-            for(unsigned int m=0;m<fracture.VerticeNumber[i]*3;m=m+4){
+            for(unsigned int m=0;m<fracture.VerticeNumber[i]*3;m=m+fracture.VerticeNumber[i]){
                 coord(p)=data[m+d];
                 p++;
             }
             fracture.Coordinates.push_back(coord);
             p=0;
         }
-        // for (unsigned int d=0;d<numV;d++)
-        // {
-        //     Vector3d coord;
-        //     for (unsigned int m=0;m<3;m++){
-        //         coord(p) = data[fracture.VerticeNumber[i]*m+d];
-        //             p++;
-        //     }
-        //     fracture.Coordinates.push_back(coord);
-        //     p=0;
-        // }
 
     }
     file.close();
@@ -90,7 +80,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
     Points.reserve(fracture.FractureNumber*(fracture.FractureNumber-1)/2);
     int sommaParziale=0; //Le coordinate non sono divise per fratture. Usiamo quindi "Somma Parziale" per considerare solo i primi tre vertici di ogni frattura
     for(unsigned int i=0;i<fracture.FractureNumber;i++){
-        //Calcolo generatoti del piano in cui è situata la frattura
+        //Calcolo generatori del piano in cui è situata la frattura
         Vector3d u;
         Vector3d v;
         u=fracture.Coordinates[sommaParziale+2]-fracture.Coordinates[sommaParziale];
