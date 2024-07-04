@@ -109,7 +109,7 @@ void ComputeSegments(const Fractures& fracture, vector<vector<Vector3d>>& segmen
 
 
 
-bool DefineTraces(const string &fileOutput, Fractures& fracture){
+bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace, vector<vector<Vector3d>>& segments){
 
     double tol=1e-10;
     vector<Vector3d> n; //Contiene terne che sono i versori normali alle fratture
@@ -144,18 +144,51 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
 
 
                 //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
-
-
-                Vector3d u;
                 Vector3d b;
                 b<<d[i],d[i+j],0;
                 Vector3d x=A.lu().solve(b);
                 //Una volta controllato se i due piani si intersecano bisogna
-                //controllare se le fratture presenti nei due piani hanno due o meno intersezioni
-                //2 intersezioni:traccia passante
-                //altrimenti:traccia interna
+                //controllare le intersezioni tra t e i segmenti delle fratture
 
+                vector<Vector3d> intersT;
+                unsigned int a=0;
+                for(unsigned int s=0;s<fracture.VerticeNumber[i];i++){
+                    Vector3d w=x-fracture.Coordinates[sommaParziale];
+                    MatrixXd A3=MatrixXd::Ones(3, 3);
+                    A3<<w, segments[i][s], t;
+                    if(A3.determinant()<tol){  //verifica che le due retti siano incidenti
+                        MatrixXd A2=MatrixXd::Ones(2, 3);
+                        A2<<fracture.Coordinates[sommaParziale], t;
+                        Vector2d coeff=(A2.transpose()).lu().solve(w);
+                        if(coeff[0]>tol && coeff[0]<1-tol && coeff[1]>tol && coeff[1]<1-tol){ //verifica per vedere se il punto appartiene al segmento della frattura
+                            Vector3d P=fracture.Coordinates[sommaParziale]+(coeff[0]*(segments[i][s]));
+                            intersT.push_back(P);
+                            a+=1;
+                        }
+                    }
+                    if(a==2){
+                        break;
+                    }
 
+                }
+                for( unsigned int v=0;v<fracture.VerticeNumber[v+1];v++){
+                    Vector3d w=x-fracture.Coordinates[sommaParziale];
+                    MatrixXd A3=MatrixXd::Ones(3, 3);
+                    A3<<w, segments[i][v], t;
+                    if(A3.determinant()<tol){  //verifica che le due retti siano incidenti
+                        MatrixXd A2=MatrixXd::Ones(2, 3);
+                        A2<<fracture.Coordinates[sommaParziale], t;
+                        Vector2d coeff=(A2.transpose()).lu().solve(w);
+                        if(coeff[0]>tol && coeff[0]<1-tol && coeff[1]>tol && coeff[1]<1-tol){ //verifica per vedere se il punto appartiene al segmento della frattura
+                            Vector3d P=fracture.Coordinates[sommaParziale]+(coeff[0]*(segments[i][v]));
+                            intersT.push_back(P);
+                            a+=1;
+                        }
+                    }
+                    if(a==4){
+                        break;
+                    }
+                }
 
             }
         }
@@ -163,24 +196,24 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
     ofstream outFile(fileOutput);
     outFile << "# Number of traces" << endl;
 
-    outFile << fracture.TracesNumber << endl;
+    outFile << trace.TracesNumber << endl;
 
     outFile << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
-    for (unsigned int t=0;t<fracture.TracesNumber;t++){
+    for (unsigned int t=0;t<trace.TracesNumber;t++){
         //itera sulle tracce ecc
     }
 
     outFile << "# FractureId; NumTraces" << endl;
     for (unsigned int f=0;f<fracture.FractureNumber;f++){
 
-    outfile << fracture.TracesNumber << endl;
+    outFile << trace.TracesNumber << endl;
 
     outFile << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
-    for (t=0;t<fracture.TracesNumber;t++){
+    for (unsigned int t=0;t<trace.TracesNumber;t++){
         //itera sulle tracce ecc
     }
 
-    outfile << "# FractureId; NumTraces" << endl;
+    outFile << "# FractureId; NumTraces" << endl;
     for (f=0;f<fracture.FractureNumber;f++){
 
         //Per ogni frattura il numero di tracce
@@ -195,3 +228,5 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture){
 //     return true;
 // }
 }
+}
+
