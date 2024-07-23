@@ -15,19 +15,20 @@ bool ImportData(const string &filePath, Fractures& fracture);
 bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace);
 
 // restituisce esito verifica (passante/non passante) mediante Tips e scrive risultato in file fileOutput
-bool CheckTrace(const string &fileOutput, Fractures& fracture) ;
+//bool CheckTrace(const string &fileOutput, Fractures& fracture) ;
 
 
 // restituisce la lunghezza di un segmento
-double ComputeLenghts(Vector3d& a, Vector3d& b);
+double ComputeLengths(Vector3d& a, Vector3d& b);
 
 // Ordinare usando l'algoritmo MergeSort--> da vedere quali parametri metterci dentro
-bool MergeSort();
+void MergeSort(Traces& trace);
+
+void Merge(vector<double>& lengths, const unsigned int& sx, const unsigned int cx, const unsigned int& dx);
 
 void ComputeSegments(Fractures& fracture);
 
-
-
+void Sorting(vector<double>& vec);
 
 }
 
