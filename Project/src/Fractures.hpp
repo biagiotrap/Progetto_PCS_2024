@@ -24,7 +24,7 @@ struct Traces{
     map<unsigned int, bool> CoupleIdTips ;    // mappa che contiene la coppia Id traccia e esito verifica della traccia(TIPS);
     vector<Vector3d> TracesPoints;                  //vettore di vettori che contengono le coordinate degli estremi delle tracce
     vector<Vector2d> IdFractures;
-    map<unsigned int,vector<unsigned int>> CoupleFracturesTraces;
+    map<unsigned int,vector<unsigned int>> CoupleFracturesTraces; //Id frattura a cui si associa un vettore contenente gli id delle tracce formate dalla frattura
     vector<double> LengthsTrace;
 };
 }
