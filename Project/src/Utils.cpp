@@ -202,9 +202,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                 }
                 if(size(intersT)==4){
                     //le due fratture formano una potenziale traccia
-                    Vector2d Id= Vector2d::Ones();
-                    Id<< i, j;
-                    trace.IdFractures.push_back(Id); //vettore contenente gli id delle fratture che coustituiscono una potenziale traccia
+
                     // Verifica di tutte le casistiche
                     double l01=ComputeLengths(intersT[0],intersT[1]);
                     double l02=ComputeLengths(intersT[0],intersT[2]);
@@ -216,8 +214,11 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                         continue;
                     }
                     else{
+                        Vector2d Id= Vector2d::Ones();
+                        Id<< i, j;
+                        trace.IdFractures.push_back(Id); //vettore contenente gli id delle fratture che coustituiscono una potenziale traccia
                         if(l02<=tol){
-                            if (l13<=tol){
+                            if (l13<=tol){  //caso passante
                                 trace.TracesPoints.push_back(intersT[0]);
                                 trace.TracesPoints.push_back(intersT[1]); 
                                 trace.CoupleIdTips[trace.TracesNumber]= false;
@@ -257,7 +258,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                             }
                         }
                         if(l03<=tol){
-                            if(l12<=tol){
+                            if(l12<=tol){  //caso passante
                                 trace.TracesPoints.push_back(intersT[0]);
                                 trace.TracesPoints.push_back(intersT[1]);
                                 trace.CoupleIdTips[trace.TracesNumber]= false;
@@ -298,47 +299,59 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                             }
                         }
                         if(l12<=tol && l03>tol){
-                            if(l01>l13){
-                                trace.TracesPoints.push_back(intersT[1]);
-                                trace.TracesPoints.push_back(intersT[3]);
-                                trace.CoupleIdTips[trace.TracesNumber]= true;
-                                trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                trace.LengthsTrace.push_back(l13);
-                                trace.TracesNumber=trace.TracesNumber+1;
+                            Vector3d u=intersT[3]-intersT[0];
+                            Vector3d v1=intersT[3]-intersT[2];
+                            Vector3d v2=intersT[0]-intersT[2];
+                            double P1=u.dot(v1);
+                            double P2=u.dot(v2);
+                            if(P1*P2>tol){
+                                if(l01>l13){
+                                    trace.TracesPoints.push_back(intersT[1]);
+                                    trace.TracesPoints.push_back(intersT[3]);
+                                    trace.CoupleIdTips[trace.TracesNumber]= true;
+                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                    trace.LengthsTrace.push_back(l13);
+                                    trace.TracesNumber=trace.TracesNumber+1;
 
-                            }
-                            else{
-                                trace.TracesPoints.push_back(intersT[0]);
-                                trace.TracesPoints.push_back(intersT[1]);
-                                trace.CoupleIdTips[trace.TracesNumber]= true;
-                                trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                trace.LengthsTrace.push_back(l01);
-                                trace.TracesNumber=trace.TracesNumber+1;
-
+                                }
+                                else{
+                                    trace.TracesPoints.push_back(intersT[0]);
+                                    trace.TracesPoints.push_back(intersT[1]);
+                                    trace.CoupleIdTips[trace.TracesNumber]= true;
+                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                    trace.LengthsTrace.push_back(l01);
+                                    trace.TracesNumber=trace.TracesNumber+1;
+                                }
                             }
                         }
                         if(l13<=tol && l02>tol){
-                            if(l01>l12){
-                                trace.TracesPoints.push_back(intersT[1]);
-                                trace.TracesPoints.push_back(intersT[2]);
-                                trace.CoupleIdTips[trace.TracesNumber]= true;
-                                trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                trace.LengthsTrace.push_back(l12);
-                                trace.TracesNumber=trace.TracesNumber+1;
+                            Vector3d u=intersT[2]-intersT[0];
+                            Vector3d v1=intersT[2]-intersT[1];
+                            Vector3d v2=intersT[0]-intersT[1];
+                            double P1=u.dot(v1);
+                            double P2=u.dot(v2);
+                            if(P1*P2>tol){
+                                if(l01>l12){
+                                    trace.TracesPoints.push_back(intersT[1]);
+                                    trace.TracesPoints.push_back(intersT[2]);
+                                    trace.CoupleIdTips[trace.TracesNumber]= true;
+                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                    trace.LengthsTrace.push_back(l12);
+                                    trace.TracesNumber=trace.TracesNumber+1;
 
-                            }
-                            else{
-                                trace.TracesPoints.push_back(intersT[0]);
-                                trace.TracesPoints.push_back(intersT[1]);
-                                trace.CoupleIdTips[trace.TracesNumber]= true;
-                                trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                trace.LengthsTrace.push_back(l01);
-                                trace.TracesNumber=trace.TracesNumber+1;
-
+                                }
+                                else{
+                                    trace.TracesPoints.push_back(intersT[0]);
+                                    trace.TracesPoints.push_back(intersT[1]);
+                                    trace.CoupleIdTips[trace.TracesNumber]= true;
+                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                    trace.LengthsTrace.push_back(l01);
+                                    trace.TracesNumber=trace.TracesNumber+1;
+                                }
                             }
                         }
                         if(l02>tol && l03>tol && l12>tol && l13>tol){
@@ -408,7 +421,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
     for(auto a=trace.CoupleFracturesTraces.begin(); a!=trace.CoupleFracturesTraces.end();a++){
         outFile << "# FractureId; NumTraces" << endl;
         vector<double> vec;
-        auto v=a->second;
+            auto v=a->second;
         outFile<< a->first<<" "<< v.size()<<endl;
         for(unsigned int b=0; b<v.size();b++){
             vec.push_back(trace.LengthsTrace[v[b]]);
