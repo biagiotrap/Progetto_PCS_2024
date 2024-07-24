@@ -147,7 +147,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                 vector<Vector3d> intersT;
                 unsigned int a=0;
                 unsigned int c=0;
-                vector<Vector3d> verifica;
                 for(unsigned int s=0;s<fracture.VerticeNumber[i];s++){
                     Vector3d w;
                     if(c==fracture.VerticeNumber[i]-1){
@@ -168,10 +167,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                             intersT.push_back(P);
                             a+=1;
                         }
-                    }
-                    else{
-                        verifica.push_back(fracture.Coordinates[sommeParziali[j]+c]);
-                        verifica.push_back(fracture.Coordinates[sommeParziali[j]+c+1]);
                     }
                     if(a==2){
                         break;
@@ -200,10 +195,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                             a+=1;
                         }
                     }
-                    else{
-                        verifica.push_back(fracture.Coordinates[sommeParziali[j]+c]);
-                        verifica.push_back(fracture.Coordinates[sommeParziali[j]+c+1]);
-                    }
                     if(a==4){
                         break;
                     }
@@ -214,8 +205,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                     Vector2d Id= Vector2d::Ones();
                     Id<< i, j;
                     trace.IdFractures.push_back(Id); //vettore contenente gli id delle fratture che coustituiscono una potenziale traccia
-                    double lato1=ComputeLengths(verifica[0],verifica[1]);
-                    double lato2=ComputeLengths(verifica[4],verifica[5]);
                     // Verifica di tutte le casistiche
                     double l01=ComputeLengths(intersT[0],intersT[1]);
                     double l02=ComputeLengths(intersT[0],intersT[2]);
@@ -223,9 +212,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                     double l12=ComputeLengths(intersT[1],intersT[2]);
                     double l13=ComputeLengths(intersT[1],intersT[3]);
                     double l23=ComputeLengths(intersT[2],intersT[3]);
-                    if(l01<=tol || l23<=tol || (l02<=tol && l13>lato1+lato2-tol)
-                        || (l03<=tol && l12>lato1+lato2-tol) || (l12<=tol && l03>lato1+lato2-tol)
-                        || (l13<=tol && l02>lato1+lato2-tol)){
+                    if(l01<=tol || l23<=tol){
                         continue;
                     }
                     else{
@@ -241,24 +228,31 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
 
                             }
                             else{
-                                if(l01>l03){
-                                    trace.TracesPoints.push_back(intersT[0]);
-                                    trace.TracesPoints.push_back(intersT[3]);
-                                    trace.CoupleIdTips[trace.TracesNumber]= true;
-                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                    trace.LengthsTrace.push_back(l03);
-                                    trace.TracesNumber=trace.TracesNumber+1;
+                                Vector3d u=intersT[3]-intersT[1];
+                                Vector3d v1=intersT[2]-intersT[1];
+                                Vector3d v2=intersT[2]-intersT[3];
+                                double P1=u.dot(v1);
+                                double P2=u.dot(v2);
+                                if(P1*P2>tol){
+                                    if(l01>l03 ){
+                                        trace.TracesPoints.push_back(intersT[0]);
+                                        trace.TracesPoints.push_back(intersT[3]);
+                                        trace.CoupleIdTips[trace.TracesNumber]= true;
+                                        trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                        trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                        trace.LengthsTrace.push_back(l03);
+                                        trace.TracesNumber=trace.TracesNumber+1;
 
-                                }
-                                else{
-                                    trace.TracesPoints.push_back(intersT[0]);
-                                    trace.TracesPoints.push_back(intersT[1]);
-                                    trace.CoupleIdTips[trace.TracesNumber]= true;
-                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                    trace.LengthsTrace.push_back(l01);
-                                    trace.TracesNumber=trace.TracesNumber+1;
+                                    }
+                                    else{
+                                        trace.TracesPoints.push_back(intersT[0]);
+                                        trace.TracesPoints.push_back(intersT[1]);
+                                        trace.CoupleIdTips[trace.TracesNumber]= true;
+                                        trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                        trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                        trace.LengthsTrace.push_back(l01);
+                                        trace.TracesNumber=trace.TracesNumber+1;
+                                    }
                                 }
                             }
                         }
@@ -274,26 +268,32 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
 
                             }
                             else{
-                                if(l01>l02){
-                                    trace.TracesPoints.push_back(intersT[0]);
-                                    trace.TracesPoints.push_back(intersT[2]);
-                                    trace.CoupleIdTips[trace.TracesNumber]= true;
-                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                    trace.LengthsTrace.push_back(l02);
-                                    trace.TracesNumber=trace.TracesNumber+1;
+                                Vector3d u=intersT[2]-intersT[1];
+                                Vector3d v1=intersT[0]-intersT[2];
+                                Vector3d v2=intersT[0]-intersT[1];
+                                double P1=u.dot(v1);
+                                double P2=u.dot(v2);
+                                if(P1*P2>tol){
+                                    if(l01>l02){
+                                        trace.TracesPoints.push_back(intersT[0]);
+                                        trace.TracesPoints.push_back(intersT[2]);
+                                        trace.CoupleIdTips[trace.TracesNumber]= true;
+                                        trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                        trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                        trace.LengthsTrace.push_back(l02);
+                                        trace.TracesNumber=trace.TracesNumber+1;
 
 
-                                }
-                                else{
-                                    trace.TracesPoints.push_back(intersT[0]);
-                                    trace.TracesPoints.push_back(intersT[1]);
-                                    trace.CoupleIdTips[trace.TracesNumber]= true;
-                                    trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
-                                    trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
-                                    trace.LengthsTrace.push_back(l01);
-                                    trace.TracesNumber=trace.TracesNumber+1;
-
+                                    }
+                                    else{
+                                        trace.TracesPoints.push_back(intersT[0]);
+                                        trace.TracesPoints.push_back(intersT[1]);
+                                        trace.CoupleIdTips[trace.TracesNumber]= true;
+                                        trace.CoupleFracturesTraces[i].push_back(trace.TracesNumber);
+                                        trace.CoupleFracturesTraces[j].push_back(trace.TracesNumber);
+                                        trace.LengthsTrace.push_back(l01);
+                                        trace.TracesNumber=trace.TracesNumber+1;
+                                    }
                                 }
                             }
                         }
@@ -414,7 +414,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
             vec.push_back(trace.LengthsTrace[v[b]]);
         }
         Sorting(vec);
-        cout<<vec[0]<<'\t'<<vec[1]<<endl;
         for(unsigned int c=0; c<vec.size();c++){
             unsigned int m=0;
             for(unsigned int d=0; vec[c]!=trace.LengthsTrace[d]; d++){
@@ -423,13 +422,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
             outFile<<"TraceId; Tips; Length"<<endl;
             outFile<<m<<"; "<< trace.CoupleIdTips[m]<<"; "<< vec[c]<<endl;
         }
-    }
-
-
-    outFile << "# FractureId; NumTraces" << endl;
-    for (unsigned int f=0;f<fracture.FractureNumber;f++){
-
-        //Per ogni frattura il numero di tracce
     }
 
 
@@ -452,7 +444,7 @@ void Merge(vector<double>& lengths, const unsigned int& sx, const unsigned int c
     vector<double> b;
     b.reserve(dx-sx+1);
     while((i<=cx) && (j<=dx)){
-        if(lengths[i]<=lengths[j]){
+        if(lengths[i]>=lengths[j]){
             b[k]=lengths[i];
             i++;
         }
