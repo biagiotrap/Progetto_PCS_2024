@@ -18,6 +18,9 @@ struct Fractures
     vector<unsigned int> Id ;                       // Vettore di interi positivi contiene l'identificativo di ogni frattura
     vector<Vector3d> Coordinates ;                   // vettore 1xFractureNumber di vettori 3x1 di double. Contiene le coordinate dei vertici
     vector<vector<Vector3d>> Segments;
+    vector<vector<unsigned int>> ListVertices;
+    MatrixXd VerticesCoordinates;
+
 };
 struct Traces{
     unsigned int TracesNumber=0 ;                     // Numero di traccia trovate

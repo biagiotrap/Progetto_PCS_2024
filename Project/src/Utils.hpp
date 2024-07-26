@@ -14,9 +14,6 @@ bool ImportData(const string &filePath, Fractures& fracture);
 // restituisce esito calcolo Traccia, e scrive risultato in fileOutput
 bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace);
 
-// restituisce esito verifica (passante/non passante) mediante Tips e scrive risultato in file fileOutput
-//bool CheckTrace(const string &fileOutput, Fractures& fracture) ;
-
 
 // restituisce la lunghezza di un segmento
 double ComputeLengths(Vector3d& a, Vector3d& b);
@@ -29,6 +26,8 @@ void Merge(vector<double>& lengths, const unsigned int& sx, const unsigned int c
 void ComputeSegments(Fractures& fracture);
 
 void Sorting(vector<double>& vec);
+
+void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles, VectorXi& materials);
 
 }
 
