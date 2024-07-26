@@ -46,6 +46,21 @@ TEST(SegmentLengthTest, TestComputeLengths) {
     EXPECT_DOUBLE_EQ(length, std::sqrt(27.0));
 }
 
+//********************************
+
+TEST(SegmentSort, TestSorting) {
+
+    vector<double> C = {1, 4, 3, 2, 6 , 5};
+
+    Sorting(C);
+
+
+    vector<double> Vec = {6,5,4,3,2,1};
+
+
+
+
+}
 }
 
 #endif
