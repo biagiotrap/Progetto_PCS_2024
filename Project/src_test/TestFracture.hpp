@@ -33,6 +33,8 @@ TEST(SegmentLengthTest, TestComputeLengths) {
     Vector3d e(0.0, 0.0, 0.0);
     Vector3d f(0.0, 0.0, 1.0);
 
+
+
     length = ComputeLengths(e, f);
     EXPECT_DOUBLE_EQ(length, 1.0);
 
