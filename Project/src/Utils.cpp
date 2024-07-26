@@ -45,7 +45,7 @@ bool ImportData(const string &filepath,Fractures& fracture){
             q=sumP[i]+w;
             v1.push_back(q);
         }
-        sumP.push_back(q);
+        sumP.push_back(q+1);
         fracture.ListVertices.push_back(v1);
         getline(file,line); //Riga "#Verti;ces" (Scarta)
         vector<double> data;
@@ -496,13 +496,14 @@ void Sorting(vector<double>& vec){
 // triangolazione dei poligoni per poterli esportare con Paraview
 
 void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles, VectorXi& materials){
+
     unsigned int numPoints=0;
     vector<vector<vector<unsigned int>>> triangleList(fracture.FractureNumber);
     for(unsigned int p=0; p<fracture.ListVertices.size(); p++){
         const unsigned int numPolygonVertices=fracture.VerticeNumber[p];
-        cout<<numPolygonVertices<<endl;
         numPoints+=numPolygonVertices;
         for(unsigned int v=0; v<numPolygonVertices;v++){
+            cout<<fracture.ListVertices[1][v]<<endl;
             const unsigned int nextVertex = fracture.ListVertices[p][(v + 1) % numPolygonVertices];
             const unsigned int nextNextVertex = fracture.ListVertices[p][(v + 2) % numPolygonVertices];
             if ((v + 2) % numPolygonVertices == 0){
@@ -514,12 +515,14 @@ void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles
     }
     fracture.VerticesCoordinates=MatrixXd::Zero(3,numPoints);
     for(unsigned int d=0; d<numPoints;d++){
-        fracture.VerticesCoordinates<<fracture.Coordinates[d];
+        for(unsigned int e=0; e<3;e++){
+            fracture.VerticesCoordinates(e,d)=fracture.Coordinates[d][e];
+        }
     }
     unsigned int numTotalTriangles= 0;
-    for(unsigned int r = 0; r < fracture.FractureNumber; r++)
+    for(unsigned int r = 0; r < fracture.FractureNumber; r++){
         numTotalTriangles+= triangleList[r].size();
-
+    }
     triangles.reserve(numTotalTriangles);
     materials= VectorXi::Zero(numTotalTriangles);
     unsigned int count= 0;
