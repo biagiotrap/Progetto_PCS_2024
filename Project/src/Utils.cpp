@@ -24,6 +24,8 @@ bool ImportData(const string &filepath,Fractures& fracture){
     getline(file,line); //Numero di fratture
     istringstream convertN(line);
     convertN>>fracture.FractureNumber;
+    vector<unsigned int> sumP;
+    sumP.push_back(0);
     for(unsigned int i=0; i<fracture.FractureNumber;i++){ //Itera sul numero di fratture
         getline(file,line); //Riga "#FractureId; NumVertices" (Scarta)
         getline(file,line,';'); //Legge fino al ';', prende id frattura
@@ -36,7 +38,16 @@ bool ImportData(const string &filepath,Fractures& fracture){
         unsigned int numV;
         convertNumV>>numV;
         fracture.VerticeNumber.push_back(numV); //Aggiunto al vettore
-        getline(file,line); //Riga "#Vertices" (Scarta)
+        unsigned int q=0;
+        vector<unsigned int> v1;
+        v1.reserve(fracture.VerticeNumber[i]);
+        for(unsigned int w=0; w<fracture.VerticeNumber[i];w++){
+            q=sumP[i]+w;
+            v1.push_back(q);
+        }
+        sumP.push_back(q);
+        fracture.ListVertices.push_back(v1);
+        getline(file,line); //Riga "#Verti;ces" (Scarta)
         vector<double> data;
         data.resize(fracture.VerticeNumber[i]*3); //3 Coordinate per numero di vertici
         //Per memorizzare le coordinate, le inseriamo prima tutte in un unico vettore di lunghezza 3*(numero di vertici),
@@ -481,6 +492,48 @@ void Merge(vector<double>& lengths, const unsigned int& sx, const unsigned int c
 void Sorting(vector<double>& vec){
     MergeSort(vec, 0, vec.size()-1);
 }
+
+// triangolazione dei poligoni per poterli esportare con Paraview
+
+void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles, VectorXi& materials){
+    unsigned int numPoints=0;
+    vector<vector<vector<unsigned int>>> triangleList(fracture.FractureNumber);
+    for(unsigned int p=0; p<fracture.ListVertices.size(); p++){
+        const unsigned int numPolygonVertices=fracture.VerticeNumber[p];
+        cout<<numPolygonVertices<<endl;
+        numPoints+=numPolygonVertices;
+        for(unsigned int v=0; v<numPolygonVertices;v++){
+            const unsigned int nextVertex = fracture.ListVertices[p][(v + 1) % numPolygonVertices];
+            const unsigned int nextNextVertex = fracture.ListVertices[p][(v + 2) % numPolygonVertices];
+            if ((v + 2) % numPolygonVertices == 0){
+                break;
+            }
+            vector<unsigned int> triangle_vertices = {fracture.ListVertices[p][0], nextVertex, nextNextVertex};
+            triangleList[p].push_back(triangle_vertices);
+        }
+    }
+    fracture.VerticesCoordinates=MatrixXd::Zero(3,numPoints);
+    for(unsigned int d=0; d<numPoints;d++){
+        fracture.VerticesCoordinates<<fracture.Coordinates[d];
+    }
+    unsigned int numTotalTriangles= 0;
+    for(unsigned int r = 0; r < fracture.FractureNumber; r++)
+        numTotalTriangles+= triangleList[r].size();
+
+    triangles.reserve(numTotalTriangles);
+    materials= VectorXi::Zero(numTotalTriangles);
+    unsigned int count= 0;
+    for(unsigned int m= 0; m< fracture.FractureNumber; m++){
+        for(unsigned int t = 0; t < triangleList[m].size(); t++){
+            triangles.push_back(triangleList[m][t]);
+            materials(count)= m;
+            count++;
+        }
+    }
+
+
+}
+
 
 }
 
