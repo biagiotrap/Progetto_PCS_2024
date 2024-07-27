@@ -102,10 +102,10 @@ void ComputeSegments(Fractures& fracture) { // scelto di il vettore di vettori i
 
 
         // Stampa i segmenti calcolati per la frattura corrente
-        cout << "Frattura " << i + 1 << ":" << endl;
-        for (unsigned int j = 0; j < fractureSegments.size(); ++j) { // Stampa tutti i segmenti della frattura corrente
-            cout << "    Segmento " << j + 1 << ": (" << fractureSegments[j].transpose() << ")" << endl;
-        }
+        //cout << "Frattura " << i + 1 << ":" << endl;
+        //for (unsigned int j = 0; j < fractureSegments.size(); ++j) { // Stampa tutti i segmenti della frattura corrente
+            //cout << "    Segmento " << j + 1 << ": (" << fractureSegments[j].transpose() << ")" << endl;
+        //}
     }
 }
 
