@@ -47,6 +47,11 @@ list(APPEND DFN_LINKED_LIBRARIES PRIVATE GTest::gmock_main)
 #list(APPEND DFN_TEST_HEADERS ${DFN_headers})
 #list(APPEND DFN_TEST_INCLUDE ${DFN_includes})
 
+add_subdirectory(Documentazione)
+list(APPEND ${CMAKE_PROJECT_NAME}_sources ${Documentazione_sources})
+list(APPEND ${CMAKE_PROJECT_NAME}_headers ${Documentazione_headers})
+list(APPEND ${CMAKE_PROJECT_NAME}_includes ${Documentazione_includes})
+
 add_subdirectory(src)
 list(APPEND ${CMAKE_PROJECT_NAME}_sources ${src_sources})
 list(APPEND ${CMAKE_PROJECT_NAME}_headers ${src_headers})
