@@ -1,0 +1,85 @@
+@startuml 
+
+title Define Traces
+
+' Create package with folder style
+package fractureLibrary <<Folder>>
+{ 
+
+class Fractures {
+    ' Visibility NameVariable : Type
+    + FractureNumber : unsigned int
+    + VerticeNumber : std::vector<unsigned int>
+    + Id : std::vector<unsigned int]
+    + Coordinates : std::vector<std::vector<Vector3d>>
+    + Segments : std::vector<std::vector<Vector3d>>
+    + ListVertices : std::vector<std::vector<unsigned int>>
+    + VerticesCoordinates : MatrixXd
+
+    .. Non member function ..
+
+    bool ImportData(const string &filePath, Fractures& fracture)
+    void ComputeSegments(Fractures& fracture)
+    void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles, VectorXi& materials)
+	void ComputeSegments(Fractures& fracture
+}
+
+class Traces {
+    + TracesNumber : unsigned int
+    + CoupleIdTips : std::map<unsigned int, bool>
+    + TracesPoints : std::vector<Vector3d]
+    + IdFractures : std::vector<Vector2d>
+    + CoupleFracturesTraces : std::map<unsigned int, std::vector<unsigned int>>
+    + LengthsTrace : std::vector<double>
+
+    .. Non member function ..
+
+    void MergeSort(Traces& trace)
+    void Merge(vector<double>& lengths, const unsigned int& sx, const unsigned int cx, const unsigned int& dx)
+    void Sorting(vector<double>& vec)
+}
+
+' Function that uses both Fractures and Traces
+interface DefineTraces {
+    + bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace)
+    + double ComputeLengths(Vector3d& a, Vector3d& b)
+}
+
+' Relationships
+Fractures "1" --> "1" Traces : Possono Contenere
+DefineTraces --> Fractures
+DefineTraces --> Traces
+
+' Note for testing
+note right of Fractures
+  GoogleTest is used to test:
+  - GedimInterface
+end note
+
+note right of Traces
+  GoogleTest is used to test:
+  - Sorting
+end note
+
+note right of DefineTraces
+  GoogleTest is used to test:
+  - DefineTraces
+  - ComputeLengths
+end note
+
+package Gedim <<Frame>>
+{
+
+}
+
+
+' PlotPolygon relies upon Gedim
+Fractures::GedimInterface --right--> Gedim
+
+' Add notes and link it with an object thourgh the sumbol ..
+note "This is an external package" as GedimNote
+GedimNote .. Gedim
+
+
+
+@enduml
