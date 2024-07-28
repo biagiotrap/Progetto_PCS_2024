@@ -503,7 +503,6 @@ void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles
         const unsigned int numPolygonVertices=fracture.VerticeNumber[p];
         numPoints+=numPolygonVertices;
         for(unsigned int v=0; v<numPolygonVertices;v++){
-            cout<<fracture.ListVertices[1][v]<<endl;
             const unsigned int nextVertex = fracture.ListVertices[p][(v + 1) % numPolygonVertices];
             const unsigned int nextNextVertex = fracture.ListVertices[p][(v + 2) % numPolygonVertices];
             if ((v + 2) % numPolygonVertices == 0){
@@ -533,7 +532,6 @@ void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles
             count++;
         }
     }
-
 
 }
 

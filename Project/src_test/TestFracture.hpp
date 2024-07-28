@@ -54,10 +54,9 @@ TEST(SegmentSort, TestSorting) {
 
     Sorting(C);
 
+    vector<double> vet={6,5,4,3,2,1};
 
-    vector<double> Vec = {6,5,4,3,2,1};
-
-
+    EXPECT_EQ(C, vet);
 
 
 }
