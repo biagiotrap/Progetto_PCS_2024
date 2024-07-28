@@ -8,7 +8,7 @@ int main(){
 
     Fractures fracture;
     Traces trace;
-    string filepath = "DFN/FR3_data.txt";
+    string filepath = "DFN/FR82_data.txt";
     string fileOutput="./Tracce.txt";
     vector<vector<unsigned int>> triangles;
     VectorXi materials;
