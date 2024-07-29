@@ -147,8 +147,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
             MatrixXd A=MatrixXd::Ones(3, 3);
             A<<n[i], n[j], t;
             MatrixXd A1=A.transpose();
-            if(A1.determinant()>tol){ //Se il determinante della matrice A contenente
-                //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
+            if(A1.determinant()>tol || A1.determinant()<-tol){ //Se il determinante della matrice A contenente                                            //le normali dei piani e il vettore perpenidcolare ad esse è diverso da zero vuol dire che i piani si intersecano
                 Vector3d b;
                 b<<d[i],d[j],0;
                 Vector3d x=A1.lu().solve(b);
@@ -175,6 +174,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                         Vector2d coeff=A2.fullPivLu().solve(w);
                         if(coeff[0]>tol && coeff[0]<1+tol){ //verifica per vedere se il punto appartiene al segmento della frattura
                             Vector3d P=fracture.Coordinates[sommeParziali[i]+c]+(coeff[0]*(fracture.Segments[i][s]));
+                            cout<<i<<endl;
                             intersT.push_back(P);
                             a+=1;
                         }
@@ -202,6 +202,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                         Vector2d coeff=A2.fullPivLu().solve(w);
                         if(coeff[0]>tol && coeff[0]<1+tol){ //verifica per vedere se il punto appartiene al segmento della frattura
                             Vector3d P=fracture.Coordinates[sommeParziali[j]+c]+(coeff[0]*(fracture.Segments[j][v]));
+                            cout<<j<<endl;
                             intersT.push_back(P);
                             a+=1;
                         }
@@ -213,7 +214,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                 }
                 if(size(intersT)==4){
                     //le due fratture formano una potenziale traccia
-
                     // Verifica di tutte le casistiche
                     double l01=ComputeLengths(intersT[0],intersT[1]);
                     double l02=ComputeLengths(intersT[0],intersT[2]);
@@ -227,7 +227,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                     else{
                         Vector2d Id= Vector2d::Ones();
                         Id<< i, j;
-                        trace.IdFractures.push_back(Id); //vettore contenente gli id delle fratture che coustituiscono una potenziale traccia
+                        trace.IdFractures.push_back(Id);    //vettore contenente gli id delle fratture che coustituiscono una potenziale traccia
                         if(l02<=tol){
                             if (l13<=tol){  //caso passante
                                 trace.TracesPoints.push_back(intersT[0]);
@@ -412,7 +412,6 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
             }
         }
     }
-
     ofstream outFile(fileOutput);
     outFile << "# Number of traces" << endl;
 
@@ -503,7 +502,6 @@ void GedimInterface(Fractures& fracture, vector<vector<unsigned int>>& triangles
         const unsigned int numPolygonVertices=fracture.VerticeNumber[p];
         numPoints+=numPolygonVertices;
         for(unsigned int v=0; v<numPolygonVertices;v++){
-            cout<<fracture.ListVertices[1][v]<<endl;
             const unsigned int nextVertex = fracture.ListVertices[p][(v + 1) % numPolygonVertices];
             const unsigned int nextNextVertex = fracture.ListVertices[p][(v + 2) % numPolygonVertices];
             if ((v + 2) % numPolygonVertices == 0){
