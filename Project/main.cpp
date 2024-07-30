@@ -8,7 +8,7 @@ int main(){
 
     Fractures fracture;
     Traces trace;
-    string filepath = "DFN/FR82_data.txt";
+    string filepath = "DFN/FR3_data.txt";
     string fileOutput="./Tracce.txt";
     vector<vector<unsigned int>> triangles;
     VectorXi materials;
@@ -20,7 +20,7 @@ int main(){
         ComputeSegments(fracture);
         DefineTraces(fileOutput, fracture, trace);
         GedimInterface(fracture, triangles, materials);
-        exporter.ExportPolygons("./polygons_82.inp",fracture.VerticesCoordinates , triangles,{},{}, materials);
+        exporter.ExportPolygons("./polygons_3.inp",fracture.VerticesCoordinates , triangles,{},{}, materials);
 
     } else {
         cout << "Errore nell'importazione dei dati." << endl;

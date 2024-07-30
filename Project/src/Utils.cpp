@@ -176,7 +176,7 @@ bool DefineTraces(const string &fileOutput, Fractures& fracture, Traces& trace){
                             Vector3d P=fracture.Coordinates[sommeParziali[i]+c]+(coeff[0]*(fracture.Segments[i][s]));
                             cout<<i<<endl;
                             intersT.push_back(P);
-                            a+=1;
+                                                        a+=1;
                         }
                     }
                     if(a==2){

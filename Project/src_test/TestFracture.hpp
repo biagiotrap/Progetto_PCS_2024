@@ -95,7 +95,7 @@ TEST(DefineTracesTest, BasicTest) {
 
 //********************************
 
-TEST(GedimTest, TestG){
+TEST(GedimTest, TestParaview){
 
     Fractures fracture;
     fracture.ListVertices = {{0,1,2,3}, {4,5,6,7}, {8,9,10,11} , {12,13,14,15}};
@@ -105,19 +105,15 @@ TEST(GedimTest, TestG){
     fracture.FractureNumber = 4;
     fracture.VerticeNumber = {4, 4, 4, 4};
     fracture.Coordinates = {
-        Vector3d(0, 0, 0), Vector3d(0, 0.5, 0), Vector3d(-0.5, 0.5, 1), Vector3d(-0.5, 0, 1), // F1
-        Vector3d(-0.5, 0, 0.5), Vector3d(1, 0, 0.5), Vector3d(1, 0.5, 0.5), Vector3d(-0.5, 0.5, 0.5), // F2
-        Vector3d(-1, -0.5, 1.5), Vector3d(1.5, -0.5, 1.5), Vector3d(1.5, 1, 1.5), Vector3d(-1, 1, 1.5), // F3
-        Vector3d(1, 0, 1), Vector3d(1, 1.5, 1), Vector3d(1, 1.5, 1.5), Vector3d(1, 0, 1.5) // F4
+    Vector3d(0, 0, 0), Vector3d(0, 0.5, 0), Vector3d(-0.5, 0.5, 1), Vector3d(-0.5, 0, 1), // F1
+    Vector3d(-0.5, 0, 0.5), Vector3d(1, 0, 0.5), Vector3d(1, 0.5, 0.5), Vector3d(-0.5, 0.5, 0.5), // F2
+    Vector3d(-1, -0.5, 1.5), Vector3d(1.5, -0.5, 1.5), Vector3d(1.5, 1, 1.5), Vector3d(-1, 1, 1.5), // F3
+    Vector3d(1, 0, 1), Vector3d(1, 1.5, 1), Vector3d(1, 1.5, 1.5), Vector3d(1, 0, 1.5) // F4
     };
 
     Gedim::UCDUtilities exporter;
     GedimInterface(fracture, triangles, materials);
     exporter.ExportPolygons("./polygons_4TEST.inp",fracture.VerticesCoordinates , triangles,{},{}, materials);
-
-
-
-
 
 
 
